@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "556005381369",
+    "project_id": "sakou-xam-xam",
+    "storage_bucket": "sakou-xam-xam.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556005381369:android:31005a5aa0ecff9b243e28",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH8Mu3PXfZxuBhE4Ye9kB61N_O3_ad4vk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
