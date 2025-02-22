@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  final String status= "Éleve";
   late final List<Widget> _pages;
   @override
   void initState() {
@@ -93,6 +94,7 @@ class _HomePageState extends State<HomePage> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                    ProfilPage(
+                                    status:status,
                             id: widget.id,
                             nom: widget.nom,
                             prenom: widget.prenom,

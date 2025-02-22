@@ -5,6 +5,7 @@ import 'package:sakou_xam_xam/Connexion/login.dart';
 import 'dart:developer';
 
 import 'package:sakou_xam_xam/vues/home.dart'; 
+import 'package:sakou_xam_xam/vues/administrateur.dart'; 
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -50,7 +51,7 @@ class Auth {
           } else if (role == 'Admin') {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage(id:id,nom: nom,prenom: prenom,email:email,telephone:tel)),
+              MaterialPageRoute(builder: (context) => AdminPage(id:id,nom: nom,prenom: prenom,email:email,telephone:tel)),
             );
           } else if(role == 'SuperAdmin'){
             Navigator.pushReplacement(

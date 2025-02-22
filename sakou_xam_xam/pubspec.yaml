@@ -25,6 +25,7 @@ dependencies:
   firebase_auth: ^4.20.0
   firebase_storage: ^11.0.4
   webviewx: ^0.2.2
+  file_picker: ^5.3.3
 
   # Gestion des requêtes HTTP.
 
