@@ -1,32 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Quiz {
+class QuizModel {
   final String id;
   final String titre;
   final String description;
-  final List<Question> questions;
+  final List<QuestionModel> questions;
 
-  Quiz({
+  QuizModel({
     required this.id,
     required this.titre,
     required this.description,
     required this.questions,
   });
 
-  // Convertir les données Firestore en objet Quiz
-  factory Quiz.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Quiz(
-      id: doc.id,
-      titre: data['titre'],
-      description: data['description'],
-      questions: (data['questions'] as List)
-          .map((q) => Question.fromMap(q))
-          .toList(),
-    );
-  }
-
-  // Convertir l'objet Quiz en Map pour Firestore
+  /// 🔹 Convertir en `Map<String, dynamic>` pour Firestore
   Map<String, dynamic> toMap() {
     return {
       'titre': titre,
@@ -34,38 +21,57 @@ class Quiz {
       'questions': questions.map((q) => q.toMap()).toList(),
     };
   }
-}
 
-class Question {
-  final String id;
-  final String question;
-  final List<String> options;
-  final int bonneReponse; // Index de la bonne réponse
+  /// ✅ Correction de `fromDocument()` pour éviter les erreurs de conversion
+  factory QuizModel.fromDocument(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>?;
 
-  Question({
-    required this.id,
-    required this.question,
-    required this.options,
-    required this.bonneReponse,
-  });
+    if (data == null) {
+      throw Exception("Données du document invalides");
+    }
 
-  // Convertir une question Firestore en objet
-  factory Question.fromMap(Map<String, dynamic> data) {
-    return Question(
-      id: data['id'],
-      question: data['question'],
-      options: List<String>.from(data['options']),
-      bonneReponse: data['bonneReponse'],
+    return QuizModel(
+      id: doc.id,
+      titre: data['titre'] ?? '',
+      description: data['description'] ?? '',
+      questions: (data['questions'] != null && data['questions'] is List)
+          ? (data['questions'] as List)
+              .map((q) => QuestionModel.fromMap(q as Map<String, dynamic>))
+              .toList()
+          : [],
     );
   }
+}
 
-  // Convertir une question en Map pour Firestore
+/// 📝 Modèle des Questions
+class QuestionModel {
+  final String question;
+  final List<String> reponses;
+  final int reponseCorrecteIndex;
+
+  QuestionModel({
+    required this.question,
+    required this.reponses,
+    required this.reponseCorrecteIndex,
+  });
+
+  /// 🔹 Convertir une question en `Map<String, dynamic>` pour Firestore
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'question': question,
-      'options': options,
-      'bonneReponse': bonneReponse,
+      'reponses': reponses,
+      'reponseCorrecteIndex': reponseCorrecteIndex,
     };
+  }
+
+  /// ✅ Correction de `fromMap()` avec vérification
+  factory QuestionModel.fromMap(Map<String, dynamic> map) {
+    return QuestionModel(
+      question: map['question'] ?? '',
+      reponses: (map['reponses'] != null && map['reponses'] is List)
+          ? List<String>.from(map['reponses'])
+          : [],
+      reponseCorrecteIndex: map['reponseCorrecteIndex'] ?? 0,
+    );
   }
 }

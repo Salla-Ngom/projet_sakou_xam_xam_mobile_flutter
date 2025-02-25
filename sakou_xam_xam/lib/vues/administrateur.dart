@@ -6,6 +6,7 @@ import '../Connexion/login.dart';
 import 'Cours/liste_cours.dart';
 import 'TP/page_tp.dart';
 import 'Quiz/quiz_list_page.dart';
+import 'Quiz/ajout_quiz.dart';
 import 'profil.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -116,7 +117,7 @@ class AdminPage extends StatelessWidget {
             body: IndexedStack(
               index: currentIndex,
               children: [
-                _HomePage(),
+            const _HomePage(),
                 _CoursPage(),
                 _TPPage(),
                 _UtilisateursPage(),
@@ -153,14 +154,124 @@ class AdminPage extends StatelessWidget {
 }
 
 /// 🏡 Page d'accueil (Statistiques)
-class _HomePage extends StatelessWidget {
+
+class _HomePage extends StatefulWidget {
+  const _HomePage({super.key});
+
+  @override
+  State<_HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<_HomePage> {
+  int totalCours = 0;
+  int totalTPs = 0;
+  int totalQuiz = 0;
+  int totalUsers = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      // Récupérer les données depuis Firestore
+      QuerySnapshot coursSnapshot = await firestore.collection('Cours').get();
+      QuerySnapshot tpSnapshot = await firestore.collection('Tps').get();
+      QuerySnapshot quizSnapshot = await firestore.collection('Quiz').get();
+      QuerySnapshot usersSnapshot = await firestore.collection('users').get();
+
+      setState(() {
+        totalCours = coursSnapshot.size;
+        totalTPs = tpSnapshot.size;
+        totalQuiz = quizSnapshot.size;
+        totalUsers = usersSnapshot.size;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget _buildStatCard(String title, int count, IconData icon, Color color) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      color: Colors.white,
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        height: 150,
+        width: 150,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: color),
+            const SizedBox(height: 10),
+            Text(
+              "$count",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("📊 Statistiques du système"),
+    return Scaffold(
+      backgroundColor: Colors.blue.shade50, // Fond légèrement coloré
+      appBar: AppBar(
+        title: const Text("📊 Tableau de bord"),
+        backgroundColor: Colors.blue,
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const Text(
+                    "Statistiques du système",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 20,
+                      mainAxisSpacing: 20,
+                      children: [
+                        _buildStatCard("Cours", totalCours, Icons.book, Colors.blue),
+                        _buildStatCard("TPs", totalTPs, Icons.science, Colors.green),
+                        _buildStatCard("Quiz", totalQuiz, Icons.quiz, Colors.orange),
+                        _buildStatCard("Utilisateurs", totalUsers, Icons.people, Colors.red),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
+
 
 /// 📚 Page des Cours
 class _CoursPage extends StatelessWidget {
@@ -210,7 +321,7 @@ class _TPPage extends StatelessWidget {
                     builder: (context) => const AjouterCoursPage()),
               );
             },
-            child: const Text("Ajouter un nouveau cours"),
+            child: const Text("Ajouter un nouveau TP"),
           ),
         ),
       ],
@@ -328,10 +439,10 @@ class _QuizPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const AjouterCoursPage()),
+                    builder: (context) => const AjouterQuizPage()),
               );
             },
-            child: const Text("Ajouter un nouveau cours"),
+            child: const Text("Ajouter un nouveau Quizz"),
           ),
         ),
       ],
